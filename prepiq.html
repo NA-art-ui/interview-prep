@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PrepIQ — Interview Preparation Platform</title>
+  <meta name="description" content="Interview prep: coding rounds, technical rounds, aptitude tests. Real FAANG questions, instant scoring." />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#080810;color:#fff;font-family:'Trebuchet MS',sans-serif;min-height:100vh}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:#0d0d1a}
+    ::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+    textarea,input,button{font-family:inherit}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const LANGUAGES = [
+  { id:"javascript", label:"JavaScript", color:"#f7df1e", ext:"js" },
+  { id:"python",     label:"Python",     color:"#3572a5", ext:"py" },
+  { id:"java",       label:"Java",       color:"#b07219", ext:"java" },
+  { id:"cpp",        label:"C++",        color:"#f34b7d", ext:"cpp" },
+  { id:"go",         label:"Go",         color:"#00add8", ext:"go" },
+  { id:"typescript", label:"TypeScript", color:"#2b7489", ext:"ts" },
+];
+
+const CODING_QS = [
+  { id:1,difficulty:"Easy",company:["Google","Amazon"],topic:"Arrays",
+    title:"Two Sum",
+    description:"Given an array of integers and a target, return indices of the two numbers that add up to target.",
+    example:"Input: nums=[2,7,11,15], target=9\nOutput: [0,1]\nExplanation: nums[0]+nums[1]=9",
+    hint:"Use a hash map: for each number, check if (target - number) is already stored.",
+    optimalApproach:"Hash map approach: iterate once, store each num's index. For each element check if (target-num) exists. O(n) time, O(n) space.",
+    keyTerms:["map","hash","{}","object","dict","complement","get","set"],
+    starterCode:{
+      javascript:"function twoSum(nums, target) {\n  // Your solution here\n}",
+      python:"def two_sum(nums: list[int], target: int) -> list[int]:\n    # Your solution here\n    pass",
+      java:"class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your solution here\n        return new int[]{};\n    }\n}",
+      cpp:"#include <vector>\n#include <unordered_map>\nusing namespace std;\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Your solution here\n        return {};\n    }\n};",
+      go:"func twoSum(nums []int, target int) []int {\n    // Your solution here\n    return nil\n}",
+      typescript:"function twoSum(nums: number[], target: number): number[] {\n  // Your solution here\n  return [];\n}",
+    }
+  },
+  { id:2,difficulty:"Medium",company:["Meta","Apple"],topic:"Strings",
+    title:"Longest Substring Without Repeating Characters",
+    description:"Given a string s, find the length of the longest substring without repeating characters.",
+    example:"Input: s=\"abcabcbb\"\nOutput: 3\nExplanation: \"abc\" has length 3",
+    hint:"Use a sliding window with a Set. Expand right, shrink from left when a duplicate is found.",
+    optimalApproach:"Sliding window: two pointers l/r, Set for seen chars. Move r right adding to set; when duplicate shrink from l. O(n).",
+    keyTerms:["set","window","left","right","pointer","max","while","has","delete"],
+    starterCode:{
+      javascript:"function lengthOfLongestSubstring(s) {\n  // Your solution here\n}",
+      python:"def length_of_longest_substring(s: str) -> int:\n    # Your solution here\n    pass",
+      java:"class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        // Your solution here\n        return 0;\n    }\n}",
+      cpp:"#include <string>\n#include <unordered_set>\nusing namespace std;\nclass Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        // Your solution here\n        return 0;\n    }\n};",
+      go:"func lengthOfLongestSubstring(s string) int {\n    // Your solution here\n    return 0\n}",
+      typescript:"function lengthOfLongestSubstring(s: string): number {\n  // Your solution here\n  return 0;\n}",
+    }
+  },
+  { id:3,difficulty:"Medium",company:["Google","Netflix"],topic:"Trees",
+    title:"Binary Tree Level Order Traversal",
+    description:"Given the root of a binary tree, return the level order traversal (left to right, level by level).",
+    example:"Input: root=[3,9,20,null,null,15,7]\nOutput: [[3],[9,20],[15,7]]",
+    hint:"BFS with a queue. Each iteration process all nodes at current level, enqueue their children.",
+    optimalApproach:"BFS: queue starts with root. Each level: record queue size n, dequeue n nodes adding values to level array, enqueue children. O(n).",
+    keyTerms:["queue","bfs","level","push","shift","dequeue","while","length","children"],
+    starterCode:{
+      javascript:"function levelOrder(root) {\n  // Your solution here\n}",
+      python:"from collections import deque\ndef level_order(root):\n    # Your solution here\n    pass",
+      java:"import java.util.*;\nclass Solution {\n    public List<List<Integer>> levelOrder(TreeNode root) {\n        // Your solution here\n        return new ArrayList<>();\n    }\n}",
+      cpp:"#include <vector>\n#include <queue>\nusing namespace std;\nclass Solution {\npublic:\n    vector<vector<int>> levelOrder(TreeNode* root) {\n        // Your solution here\n        return {};\n    }\n};",
+      go:"func levelOrder(root *TreeNode) [][]int {\n    // Your solution here\n    return nil\n}",
+      typescript:"function levelOrder(root: TreeNode | null): number[][] {\n  // Your solution here\n  return [];\n}",
+    }
+  },
+  { id:4,difficulty:"Hard",company:["Amazon","Microsoft"],topic:"Dynamic Programming",
+    title:"Longest Common Subsequence",
+    description:"Given two strings, return the length of their longest common subsequence. Return 0 if there is none.",
+    example:"Input: text1=\"abcde\", text2=\"ace\"\nOutput: 3\nExplanation: \"ace\" is LCS",
+    hint:"Build a 2D DP table. dp[i][j] = LCS length for text1[0..i-1] and text2[0..j-1].",
+    optimalApproach:"2D DP: if chars match dp[i][j]=dp[i-1][j-1]+1, else dp[i][j]=max(dp[i-1][j],dp[i][j-1]). O(m*n) time/space.",
+    keyTerms:["dp","table","2d","array","match","max","memo","matrix","cache"],
+    starterCode:{
+      javascript:"function longestCommonSubsequence(text1, text2) {\n  // Your solution here\n}",
+      python:"def longest_common_subsequence(text1: str, text2: str) -> int:\n    # Your solution here\n    pass",
+      java:"class Solution {\n    public int longestCommonSubsequence(String text1, String text2) {\n        // Your solution here\n        return 0;\n    }\n}",
+      cpp:"#include <string>\n#include <vector>\nusing namespace std;\nclass Solution {\npublic:\n    int longestCommonSubsequence(string text1, string text2) {\n        // Your solution here\n        return 0;\n    }\n};",
+      go:"func longestCommonSubsequence(text1 string, text2 string) int {\n    // Your solution here\n    return 0\n}",
+      typescript:"function longestCommonSubsequence(text1: string, text2: string): number {\n  // Your solution here\n  return 0;\n}",
+    }
+  },
+  { id:5,difficulty:"Medium",company:["Google","Meta"],topic:"Graphs",
+    title:"Number of Islands",
+    description:"Given a 2D grid of '1' (land) and '0' (water), count the number of islands.",
+    example:"Input: grid=[[\"1\",\"1\",\"0\"],[\"0\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]]\nOutput: 2",
+    hint:"For each unvisited '1', run DFS to mark all connected land as visited. Count DFS calls.",
+    optimalApproach:"DFS: iterate grid, when '1' found increment count, DFS to mark all connected '1's as '0'. O(m*n) time.",
+    keyTerms:["dfs","bfs","visited","count","grid","for","recursive","neighbor","mark"],
+    starterCode:{
+      javascript:"function numIslands(grid) {\n  // Your solution here\n}",
+      python:"def num_islands(grid: list[list[str]]) -> int:\n    # Your solution here\n    pass",
+      java:"class Solution {\n    public int numIslands(char[][] grid) {\n        // Your solution here\n        return 0;\n    }\n}",
+      cpp:"#include <vector>\nusing namespace std;\nclass Solution {\npublic:\n    int numIslands(vector<vector<char>>& grid) {\n        // Your solution here\n        return 0;\n    }\n};",
+      go:"func numIslands(grid [][]byte) int {\n    // Your solution here\n    return 0\n}",
+      typescript:"function numIslands(grid: string[][]): number {\n  // Your solution here\n  return 0;\n}",
+    }
+  },
+  { id:6,difficulty:"Easy",company:["Amazon","Apple"],topic:"Linked List",
+    title:"Reverse Linked List",
+    description:"Given the head of a singly linked list, reverse it and return the new head.",
+    example:"Input: [1,2,3,4,5]\nOutput: [5,4,3,2,1]",
+    hint:"Three pointers: prev=null, curr=head, next. Each step: save next, reverse arrow, advance pointers.",
+    optimalApproach:"Iterative: prev=null, curr=head. While curr: save next, point curr.next=prev, prev=curr, curr=next. Return prev. O(n) O(1).",
+    keyTerms:["prev","next","curr","null","while","pointer","reverse","temp"],
+    starterCode:{
+      javascript:"function reverseList(head) {\n  // Your solution here\n}",
+      python:"def reverse_list(head):\n    # Your solution here\n    pass",
+      java:"class Solution {\n    public ListNode reverseList(ListNode head) {\n        // Your solution here\n        return null;\n    }\n}",
+      cpp:"class Solution {\npublic:\n    ListNode* reverseList(ListNode* head) {\n        // Your solution here\n        return nullptr;\n    }\n};",
+      go:"func reverseList(head *ListNode) *ListNode {\n    // Your solution here\n    return nil\n}",
+      typescript:"function reverseList(head: ListNode | null): ListNode | null {\n  // Your solution here\n  return null;\n}",
+    }
+  },
+  { id:7,difficulty:"Hard",company:["Google","Uber"],topic:"Heap",
+    title:"Find K Pairs with Smallest Sums",
+    description:"Given two sorted integer arrays and k, return the k pairs (one from each) with smallest sums.",
+    example:"Input: nums1=[1,7,11], nums2=[2,4,6], k=3\nOutput: [[1,2],[1,4],[1,6]]",
+    hint:"Min-heap seeded with (nums1[i], nums2[0]) for i in 0..k-1. Pop and push next candidate.",
+    optimalApproach:"Min-heap: seed with first k pairs (nums1[0..k], nums2[0]). Pop min, push (nums1[i], nums2[j+1]) successor. O(k log k).",
+    keyTerms:["heap","priority","min","push","pop","pair","smallest","sum","queue"],
+    starterCode:{
+      javascript:"function kSmallestPairs(nums1, nums2, k) {\n  // Your solution here\n}",
+      python:"import heapq\ndef k_smallest_pairs(nums1: list[int], nums2: list[int], k: int) -> list[list[int]]:\n    # Your solution here\n    pass",
+      java:"import java.util.*;\nclass Solution {\n    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {\n        // Your solution here\n        return new ArrayList<>();\n    }\n}",
+      cpp:"#include <vector>\n#include <queue>\nusing namespace std;\nclass Solution {\npublic:\n    vector<vector<int>> kSmallestPairs(vector<int>& n1, vector<int>& n2, int k) {\n        // Your solution here\n        return {};\n    }\n};",
+      go:"func kSmallestPairs(nums1 []int, nums2 []int, k int) [][]int {\n    // Your solution here\n    return nil\n}",
+      typescript:"function kSmallestPairs(nums1: number[], nums2: number[], k: number): number[][] {\n  // Your solution here\n  return [];\n}",
+    }
+  },
+  { id:8,difficulty:"Medium",company:["Microsoft","Meta"],topic:"Backtracking",
+    title:"Permutations",
+    description:"Given an array of distinct integers, return all possible permutations in any order.",
+    example:"Input: [1,2,3]\nOutput: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]",
+    hint:"Backtrack: at each position, swap in each remaining element, recurse on next position, swap back.",
+    optimalApproach:"Backtrack with swap: swap nums[start] with nums[i], recurse(start+1), swap back. n! permutations, O(n * n!) total.",
+    keyTerms:["backtrack","swap","recurse","result","push","pop","slice","copy","base"],
+    starterCode:{
+      javascript:"function permute(nums) {\n  // Your solution here\n}",
+      python:"def permute(nums: list[int]) -> list[list[int]]:\n    # Your solution here\n    pass",
+      java:"import java.util.*;\nclass Solution {\n    public List<List<Integer>> permute(int[] nums) {\n        // Your solution here\n        return new ArrayList<>();\n    }\n}",
+      cpp:"#include <vector>\nusing namespace std;\nclass Solution {\npublic:\n    vector<vector<int>> permute(vector<int>& nums) {\n        // Your solution here\n        return {};\n    }\n};",
+      go:"func permute(nums []int) [][]int {\n    // Your solution here\n    return nil\n}",
+      typescript:"function permute(nums: number[]): number[][] {\n  // Your solution here\n  return [];\n}",
+    }
+  },
+];
+
+const TECHNICAL_QS = [
+  { id:1,category:"System Design",company:["Google","Meta","Amazon"],difficulty:"Hard",
+    question:"Design a URL shortening service like bit.ly. Handle 100M URLs/day with analytics.",
+    keyPoints:["API design","Database choice","Hashing algorithm","Caching layer","Analytics pipeline","Load balancing"],
+    modelAnswer:"Use base62 hashing for short codes (7 chars). Store in relational DB. Cache hot URLs in Redis. Load balance across app servers. For analytics, stream click events to Kafka → data warehouse asynchronously.",
+    commonMistakes:["Not discussing hash collision handling","Ignoring read-heavy traffic patterns","No caching layer","Missing analytics pipeline design"]
+  },
+  { id:2,category:"OS Concepts",company:["All"],difficulty:"Medium",
+    question:"Explain the difference between a process and a thread. When would you use one over the other?",
+    keyPoints:["Memory isolation","Context switching cost","Communication overhead","Use cases","Race conditions"],
+    modelAnswer:"Processes have isolated memory spaces; threads share parent memory. Threads have lower context-switch overhead and easier communication but require synchronization. Use processes for isolation (microservices, browser tabs); threads for CPU parallelism within one program.",
+    commonMistakes:["Mixing up concurrency vs parallelism","Forgetting Python GIL caveat","Not discussing deadlocks or race conditions"]
+  },
+  { id:3,category:"Databases",company:["Amazon","Microsoft"],difficulty:"Medium",
+    question:"When would you choose NoSQL over SQL? Design a schema for a social media platform.",
+    keyPoints:["CAP theorem","Horizontal scaling","Schema flexibility","ACID vs BASE","Query patterns"],
+    modelAnswer:"Choose NoSQL for flexible schemas, horizontal scaling, high write throughput. For social media: document store for posts/profiles, graph DB for friend connections, relational for billing. NoSQL sacrifices strong consistency for availability and partition tolerance.",
+    commonMistakes:["'NoSQL is always faster' — wrong","Not modeling based on query patterns","Ignoring eventual consistency implications"]
+  },
+  { id:4,category:"Networking",company:["All"],difficulty:"Easy",
+    question:"What happens when you type 'google.com' in a browser and press Enter?",
+    keyPoints:["DNS resolution","TCP handshake","HTTPS/TLS","HTTP request","Server response","Rendering"],
+    modelAnswer:"Browser checks DNS cache → ISP resolver → authoritative DNS gets IP → TCP 3-way handshake → TLS handshake for HTTPS → HTTP GET request → server returns HTML → browser parses, fetches sub-resources (CSS, JS, images) → DOM constructed → page renders.",
+    commonMistakes:["Skipping TLS handshake","No mention of browser/OS DNS cache","Forgetting the TCP SYN-SYN/ACK-ACK flow"]
+  },
+  { id:5,category:"System Design",company:["Netflix","Uber"],difficulty:"Hard",
+    question:"Design a real-time chat application for 10 million concurrent users.",
+    keyPoints:["WebSockets","Message queues","Pub/Sub pattern","Database partitioning","Message delivery guarantees"],
+    modelAnswer:"WebSocket connections per user managed by chat servers. Pub/Sub via Redis or Kafka for message fan-out. Messages persisted in Cassandra partitioned by conversation_id. Presence service tracks online status. Use message IDs for deduplication and at-least-once delivery.",
+    commonMistakes:["HTTP long-polling instead of WebSockets","Single broker with no partitioning","No offline message queuing","Missing message ordering guarantees"]
+  },
+  { id:6,category:"OOP & Design Patterns",company:["Microsoft","Oracle"],difficulty:"Medium",
+    question:"Explain SOLID principles with real-world examples. Which is most impactful in your experience?",
+    keyPoints:["Single Responsibility","Open/Closed","Liskov Substitution","Interface Segregation","Dependency Inversion"],
+    modelAnswer:"S: one class, one reason to change. O: open for extension, closed for modification (use inheritance). L: subclasses must be substitutable for their base. I: small focused interfaces. D: depend on abstractions not concretions. Most impactful: Dependency Inversion — it's the foundation of testable, loosely-coupled code.",
+    commonMistakes:["Reciting definitions without examples","Confusing Open/Closed with avoiding all changes","Not linking to practical testability benefits"]
+  },
+  { id:7,category:"Behavioral",company:["All"],difficulty:"Easy",
+    question:"Tell me about a time you had a conflict with a team member. How did you resolve it?",
+    keyPoints:["STAR format","Conflict identification","Communication approach","Resolution strategy","Outcome & learning"],
+    modelAnswer:"STAR structure: Situation (brief context), Task (your role), Action (how you initiated private conversation, listened actively, found common ground without escalating), Result (positive team outcome). Show you prioritize collaboration over being right and learned from it.",
+    commonMistakes:["Blaming the other person entirely","No clear resolution","Being too vague about what the conflict was","Not mentioning what you learned"]
+  },
+  { id:8,category:"Networking",company:["Google","Cloudflare"],difficulty:"Medium",
+    question:"Explain the differences between TCP and UDP. When would you use each?",
+    keyPoints:["Connection-oriented vs connectionless","Reliability guarantees","Performance trade-offs","Use cases: streaming vs file transfer"],
+    modelAnswer:"TCP: connection-oriented, reliable (ACKs, retransmission, ordering), higher overhead. UDP: connectionless, no delivery guarantee, lower latency. TCP for file transfer, HTTP, emails. UDP for video streaming, gaming, DNS queries, VoIP — where speed beats perfect reliability. QUIC (HTTP/3) adds reliability on top of UDP.",
+    commonMistakes:["Forgetting that UDP can still be reliable at app layer","Not giving concrete use cases","Missing the QUIC/HTTP3 context"]
+  },
+];
+
+const APTITUDE_QS = [
+  { id:1,category:"Quantitative",difficulty:"Medium",
+    question:"A train travels from A to B at 60 km/h and returns at 40 km/h. Average speed for entire journey?",
+    options:["48 km/h","50 km/h","52 km/h","54 km/h"],answer:0,
+    explanation:"Use harmonic mean: 2×v1×v2/(v1+v2) = 2×60×40/100 = 48 km/h. Never average speeds directly — the times are different." },
+  { id:2,category:"Logical Reasoning",difficulty:"Easy",
+    question:"All Bloops are Razzles. All Razzles are Lazzles. Which must be true?",
+    options:["All Bloops are Lazzles","All Lazzles are Bloops","All Razzles are Bloops","None"],answer:0,
+    explanation:"By transitivity: Bloops → Razzles → Lazzles, so all Bloops are Lazzles. Reverse chains are not guaranteed." },
+  { id:3,category:"Quantitative",difficulty:"Hard",
+    question:"In how many ways can 5 people line up if 2 specific people must always be adjacent?",
+    options:["24","48","96","120"],answer:1,
+    explanation:"Treat the 2 as one unit → 4 items to arrange. 4! = 24. The pair can swap internally × 2. Total = 48." },
+  { id:4,category:"Data Interpretation",difficulty:"Medium",
+    question:"A store applies 20% discount then 10% more. Total effective discount?",
+    options:["28%","30%","32%","25%"],answer:0,
+    explanation:"Final = 100 × 0.8 × 0.9 = 72. Discount = 28%. Successive discounts multiply, not add." },
+  { id:5,category:"Pattern Recognition",difficulty:"Easy",
+    question:"Find next: 2, 6, 12, 20, 30, ?",
+    options:["40","42","44","46"],answer:1,
+    explanation:"Differences: 4, 6, 8, 10, 12 (gap increases by 2). Next = 30 + 12 = 42." },
+  { id:6,category:"Logical Reasoning",difficulty:"Medium",
+    question:"D ahead of A. A ahead of B. E between A and C. C behind E. Front to back order?",
+    options:["D,A,E,C,B","D,A,B,E,C","D,E,A,C,B","A,D,E,C,B"],answer:0,
+    explanation:"D → A → E → C → B satisfies all constraints: D>A>E, E between A and C, C behind E, A>B." },
+  { id:7,category:"Verbal",difficulty:"Easy",
+    question:"Closest meaning to EPHEMERAL:",
+    options:["Eternal","Transient","Robust","Substantial"],answer:1,
+    explanation:"Ephemeral = very short-lived. Transient is the synonym. Eternal is the antonym." },
+  { id:8,category:"Quantitative",difficulty:"Hard",
+    question:"If log₂(x) + log₂(x-7) = 3, find x.",
+    options:["8","7","4","12"],answer:0,
+    explanation:"log₂(x(x-7))=3 → x²-7x=8 → (x-8)(x+1)=0 → x=8 (x must be positive, so x=-1 rejected)." },
+];
+
+const ROUND_META = {
+  coding:    { label:"Coding Round",    icon:"⌨", color:"#00ff88", desc:"8 DSA problems · 6 languages · Instant scoring",    bg:"rgba(0,255,136,0.06)" },
+  technical: { label:"Technical Round", icon:"⚙", color:"#00b4ff", desc:"System design, CS fundamentals & behavioral",          bg:"rgba(0,180,255,0.06)" },
+  aptitude:  { label:"Aptitude Round",  icon:"≡", color:"#ff6b35", desc:"Quant, logical reasoning & verbal MCQs · 90s timer",   bg:"rgba(255,107,53,0.06)" },
+};
+const DIFF_COLORS = { Easy:"#00ff88", Medium:"#ffb800", Hard:"#ff4d6d" };
+
+// ─── SCORING ENGINE ───────────────────────────────────────────────────────────
+function scoreCode(code, q, lang) {
+  const starter = q.starterCode[lang];
+  if (!code.trim() || code.trim() === starter.trim()) return null;
+  const c = code.toLowerCase();
+  const nonBlankLines = code.split("\n").filter(l => l.trim() && !l.trim().startsWith("//") && !l.trim().startsWith("#") && !l.trim().startsWith("*")).length;
+  const hasReturn    = /return\s+[^;{}\n]+/.test(code);
+  const hasLoop      = /for\s*\(|while\s*\(|forEach|\.map\s*\(|for\s+\w+\s+in|for\s+.*range/.test(code);
+  const hasCondition = /if\s*\(|if\s+[^:]|else|switch/.test(code);
+  const keyHits      = q.keyTerms.filter(t => c.includes(t.toLowerCase())).length;
+  const isOptimal    = keyHits >= 2;
+
+  let correctness = 25;
+  if (nonBlankLines >= 3)  correctness += 10;
+  if (hasReturn)           correctness += 20;
+  if (hasLoop || hasCondition) correctness += 15;
+  if (keyHits >= 1)        correctness += 15;
+  if (keyHits >= 2)        correctness += 15;
+  correctness = Math.min(92, correctness);
+
+  let efficiency = isOptimal ? Math.min(90, 72 + keyHits*4) : hasLoop ? 50 : 35;
+  let quality    = 40 + Math.min(40, nonBlankLines*4) + (hasCondition?8:0) + (hasReturn?7:0);
+  quality = Math.min(90, quality);
+
+  const overall = Math.round(correctness*0.45 + efficiency*0.35 + quality*0.20);
+  const verdict = overall>=80?"Accepted":overall>=60?"Partially Correct":overall>=40?"Needs Improvement":"Wrong Answer";
+  const vc = {"Accepted":"#00ff88","Partially Correct":"#ffb800","Needs Improvement":"#ff6b35","Wrong Answer":"#ff4d6d"}[verdict];
+
+  const strengths = [];
+  if (hasReturn) strengths.push("Function produces a return value");
+  if (isOptimal) strengths.push(`Uses key technique (${q.keyTerms.slice(0,2).join("/")}) for an efficient approach`);
+  if (hasLoop)   strengths.push("Iterates through the input data");
+  if (nonBlankLines >= 6) strengths.push("Code has reasonable structure and length");
+  if (strengths.length === 0) strengths.push("Attempted the problem with some code written");
+
+  const improvements = [];
+  if (!isOptimal) improvements.push(`Apply: ${q.keyTerms.slice(0,3).join(", ")} — these are key to an optimal solution`);
+  if (!hasReturn) improvements.push("Ensure the function returns the correct result");
+  if (efficiency < 65) improvements.push("Look for a lower time complexity — can you reduce O(n²) to O(n)?");
+  improvements.push("Always verify: empty array, single element, and negative/duplicate inputs");
+  improvements.push("State time & space complexity aloud before and after coding");
+
+  return {
+    correctness, efficiency, codeQuality:quality, communication:60, overall, verdict, verdictColor:vc,
+    timeComplexity: isOptimal ? "O(n)" : hasLoop ? "O(n²)" : "O(?)",
+    spaceComplexity: isOptimal ? "O(n)" : "O(1)",
+    strengths: strengths.slice(0,3),
+    improvements: improvements.slice(0,3),
+    optimalApproach: q.optimalApproach,
+    interviewTip:"Explain your approach before writing any code, and narrate your thinking as you go.",
+  };
+}
+
+function scoreTechnical(answer, q) {
+  if (!answer || answer.trim().length < 20) return null;
+  const a = answer.toLowerCase();
+  const covered = q.keyPoints.filter(p =>
+    p.toLowerCase().split(/[\s/&]+/).some(word => word.length > 3 && a.includes(word))
+  );
+  const missed = q.keyPoints.filter(p => !covered.includes(p));
+  const words = answer.trim().split(/\s+/).length;
+  const pct   = covered.length / q.keyPoints.length;
+
+  const depth        = Math.min(93, Math.round(35 + words*0.25 + pct*25));
+  const accuracy     = Math.min(93, Math.round(35 + pct*58));
+  const clarity      = Math.min(93, Math.round(45 + Math.min(words/4, 22) + (answer.split(".").length > 2 ? 8:0)));
+  const completeness = Math.min(93, Math.round(pct*100));
+  const overall      = Math.round(depth*0.25 + accuracy*0.35 + clarity*0.2 + completeness*0.2);
+  const grade        = overall>=80?"Excellent":overall>=65?"Good":overall>=45?"Average":"Below Average";
+
+  const improvements = [];
+  if (missed.length > 0) improvements.push(`Still cover: ${missed.slice(0,2).join(", ")}`);
+  if (words < 80)        improvements.push("Expand your answer — aim for 100+ words with specific details");
+  if (!a.includes("example") && !a.includes("e.g") && !a.includes("instance"))
+                         improvements.push("Include a concrete real-world example or analogy");
+  improvements.push("Discuss trade-offs: when would this approach fail or be the wrong choice?");
+
+  return {
+    depth, accuracy, clarity, completeness, overall, grade,
+    coveredPoints: covered.length > 0 ? covered : ["Some understanding demonstrated"],
+    missedPoints:  missed.length  > 0 ? missed  : ["Good coverage overall"],
+    improvements: improvements.slice(0,3),
+    modelAnswer: q.modelAnswer,
+    commonMistakes: q.commonMistakes,
+    followUpQ: "What are the biggest trade-offs or failure modes in your approach?",
+  };
+}
+
+// ─── UI COMPONENTS ────────────────────────────────────────────────────────────
+function Tag({ children, color }) {
+  return <span style={{ fontSize:11,padding:"3px 8px",borderRadius:5,background:`${color}15`,color,border:`1px solid ${color}30`,fontFamily:"monospace",letterSpacing:0.5 }}>{children}</span>;
+}
+
+function ScoreRing({ score, color, size=80 }) {
+  const r=(size/2)-8, circ=2*Math.PI*r, offset=circ-(score/100)*circ;
+  return (
+    <svg width={size} height={size} style={{ transform:"rotate(-90deg)",flexShrink:0 }}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#1a1a2e" strokeWidth="7"/>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="7"
+        strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
+        style={{ transition:"stroke-dashoffset 1s ease" }}/>
+      <text x={size/2} y={size/2+5} textAnchor="middle" fill={color} fontSize="14" fontWeight="700"
+        style={{ transform:`rotate(90deg)`,transformOrigin:`${size/2}px ${size/2}px`,fontFamily:"monospace" }}>
+        {score}
+      </text>
+    </svg>
+  );
+}
+
+function Timer({ running, onTimeUp, initialSeconds=900 }) {
+  const [sec, setSec] = useState(initialSeconds);
+  useEffect(() => {
+    if (!running) return;
+    setSec(initialSeconds);
+    const id = setInterval(() => setSec(s => { if(s<=1){clearInterval(id);onTimeUp&&onTimeUp();return 0;} return s-1; }), 1000);
+    return () => clearInterval(id);
+  }, [running, initialSeconds]);
+  const m=Math.floor(sec/60), s=sec%60, danger=sec<120;
+  return (
+    <div style={{ fontFamily:"monospace",fontSize:16,fontWeight:700,letterSpacing:2,
+      color:danger?"#ff4d6d":"#aaa",background:danger?"rgba(255,77,109,0.1)":"rgba(255,255,255,0.04)",
+      padding:"6px 14px",borderRadius:8,border:`1px solid ${danger?"rgba(255,77,109,0.3)":"rgba(255,255,255,0.08)"}`,transition:"all 0.3s" }}>
+      {String(m).padStart(2,"0")}:{String(s).padStart(2,"0")}
+    </div>
+  );
+}
+
+// ─── HOME ─────────────────────────────────────────────────────────────────────
+function Home({ onStart, scores }) {
+  const total = Object.values(scores).reduce((a,b)=>a+b.sessions,0);
+  const avg   = total>0 ? Math.round(Object.values(scores).reduce((a,b)=>a+(b.avg||0),0)/3) : 0;
+  return (
+    <div style={{ maxWidth:900,margin:"0 auto",padding:"0 24px" }}>
+      <div style={{ textAlign:"center",padding:"60px 0 40px" }}>
+        <div style={{ display:"inline-block",fontSize:11,letterSpacing:4,color:"#00ff88",textTransform:"uppercase",
+          fontFamily:"monospace",background:"rgba(0,255,136,0.08)",padding:"6px 16px",
+          borderRadius:20,border:"1px solid rgba(0,255,136,0.2)",marginBottom:24 }}>
+          Interview Prep · FAANG Ready · No Login Required
+        </div>
+        <h1 style={{ fontSize:"clamp(28px,5vw,54px)",fontWeight:900,margin:"0 0 16px",fontFamily:"Georgia,serif",lineHeight:1.1,
+          background:"linear-gradient(135deg,#fff 0%,#aaa 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>
+          Crack Every<br/>
+          <span style={{ background:"linear-gradient(90deg,#00ff88,#00b4ff)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>Interview Round</span>
+        </h1>
+        <p style={{ color:"#666",fontSize:15,maxWidth:500,margin:"0 auto 32px",lineHeight:1.7 }}>
+          Practice coding, technical, and aptitude rounds with real FAANG questions.
+          Instant scoring and improvement tips — no sign-up, works offline.
+        </p>
+        {total>0 && (
+          <div style={{ display:"inline-flex",gap:32,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"12px 28px",marginBottom:40 }}>
+            {[["Sessions",total],["Avg Score",`${avg}%`],["Status","Active"]].map(([l,v],i)=>(
+              <React.Fragment key={l}>
+                {i>0&&<div style={{ width:1,background:"rgba(255,255,255,0.08)" }}/>}
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ color:"#fff",fontSize:18,fontWeight:700,fontFamily:"monospace" }}>{v}</div>
+                  <div style={{ color:"#555",fontSize:11,marginTop:2 }}>{l}</div>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",gap:20,marginBottom:40 }}>
+        {Object.entries(ROUND_META).map(([key,meta]) => {
+          const s = scores[key];
+          return (
+            <div key={key} onClick={()=>onStart(key)}
+              style={{ background:meta.bg,border:`1px solid ${meta.color}22`,borderRadius:16,padding:28,cursor:"pointer",transition:"all 0.25s" }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow=`0 12px 40px ${meta.color}15`;e.currentTarget.style.borderColor=`${meta.color}55`;}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";e.currentTarget.style.borderColor=`${meta.color}22`;}}>
+              <div style={{ fontSize:26,marginBottom:12 }}>{meta.icon}</div>
+              <div style={{ fontSize:11,letterSpacing:3,color:meta.color,fontFamily:"monospace",textTransform:"uppercase",marginBottom:8 }}>{meta.label}</div>
+              <p style={{ color:"#888",fontSize:14,lineHeight:1.6,margin:"0 0 20px" }}>{meta.desc}</p>
+              {s.sessions>0&&(
+                <div style={{ display:"flex",alignItems:"center",gap:12,background:"rgba(0,0,0,0.3)",borderRadius:8,padding:"8px 12px",marginBottom:16 }}>
+                  <ScoreRing score={s.avg} color={meta.color} size={46}/>
+                  <div>
+                    <div style={{ color:"#fff",fontSize:13,fontWeight:600 }}>{s.avg}% avg</div>
+                    <div style={{ color:"#555",fontSize:11 }}>{s.sessions} session{s.sessions>1?"s":""}</div>
+                  </div>
+                </div>
+              )}
+              <button style={{ background:`${meta.color}15`,border:`1px solid ${meta.color}44`,color:meta.color,padding:"10px 20px",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:700,letterSpacing:1,width:"100%",fontFamily:"monospace" }}>
+                {s.sessions>0?"PRACTICE AGAIN →":"START ROUND →"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:16,padding:24,marginBottom:24 }}>
+        <div style={{ color:"#555",fontSize:11,letterSpacing:3,fontFamily:"monospace",marginBottom:16 }}>INTERVIEW STRATEGY</div>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:16 }}>
+          {[["01","Think aloud","Interviewers value communication as much as the final answer"],
+            ["02","Brute force first","Then optimize — demonstrate your problem-solving process"],
+            ["03","State complexity","Always give time and space complexity before wrapping up"],
+            ["04","Test edge cases","Check: empty, single element, negatives, overflow, duplicates"]
+          ].map(([n,t,d])=>(
+            <div key={t} style={{ display:"flex",gap:12,alignItems:"flex-start" }}>
+              <span style={{ fontSize:10,fontFamily:"monospace",color:"#444",minWidth:18,paddingTop:3 }}>{n}</span>
+              <div>
+                <div style={{ color:"#ccc",fontSize:13,fontWeight:600,marginBottom:4 }}>{t}</div>
+                <div style={{ color:"#555",fontSize:12,lineHeight:1.5 }}>{d}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── CODING ROUND ─────────────────────────────────────────────────────────────
+function CodingRound({ onComplete, onBack }) {
+  const [qIdx, setQIdx] = useState(0);
+  const [lang, setLang] = useState("javascript");
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState(null);
+  const [hintShown, setHintShown] = useState(false);
+  const [timerKey, setTimerKey] = useState(0);
+  const q = CODING_QS[qIdx];
+  const meta = ROUND_META.coding;
+  const activeLang = LANGUAGES.find(l=>l.id===lang);
+  const lineCount = code.split("\n").length;
+
+  useEffect(()=>{ setCode(q.starterCode[lang]); setResult(null); setHintShown(false); setTimerKey(k=>k+1); }, [qIdx,lang]);
+
+  return (
+    <div style={{ maxWidth:1200,margin:"0 auto",padding:"0 24px" }}>
+      {/* Header */}
+      <div style={{ display:"flex",alignItems:"center",gap:12,padding:"20px 0",borderBottom:"1px solid rgba(255,255,255,0.06)",marginBottom:20,flexWrap:"wrap" }}>
+        <button onClick={onBack} style={{ background:"none",border:"1px solid #333",color:"#888",padding:"6px 14px",borderRadius:8,cursor:"pointer",fontSize:13 }}>← Back</button>
+        <div style={{ flex:1,minWidth:120 }}>
+          <div style={{ color:meta.color,fontSize:10,letterSpacing:3,fontFamily:"monospace" }}>CODING ROUND</div>
+          <div style={{ color:"#fff",fontWeight:700,fontSize:15 }}>{q.title}</div>
+        </div>
+        <Timer key={timerKey} running={!result} initialSeconds={900}/>
+        <div style={{ display:"flex",gap:6 }}>
+          {CODING_QS.map((_,i)=>(
+            <div key={i} onClick={()=>setQIdx(i)} title={CODING_QS[i].title}
+              style={{ width:10,height:10,borderRadius:"50%",cursor:"pointer",background:i===qIdx?meta.color:"rgba(255,255,255,0.15)",transition:"all 0.2s" }}/>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display:"grid",gridTemplateColumns:result?"1fr":"1fr 1fr",gap:20 }}>
+        {!result && (
+          <div>
+            <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:12,padding:22,marginBottom:14 }}>
+              <div style={{ display:"flex",gap:8,flexWrap:"wrap",marginBottom:14 }}>
+                <Tag color={DIFF_COLORS[q.difficulty]}>{q.difficulty}</Tag>
+                <Tag color="#888">{q.topic}</Tag>
+                {q.company.map(c=><Tag key={c} color="#555">{c}</Tag>)}
+              </div>
+              <p style={{ color:"#ccc",fontSize:14,lineHeight:1.8,marginBottom:14 }}>{q.description}</p>
+              <div style={{ background:"rgba(0,0,0,0.4)",borderRadius:8,padding:14,fontFamily:"monospace",fontSize:12,color:"#aaa",whiteSpace:"pre-wrap" }}>{q.example}</div>
+            </div>
+            <button onClick={()=>setHintShown(!hintShown)} style={{ background:"rgba(255,184,0,0.08)",border:"1px solid rgba(255,184,0,0.2)",color:"#ffb800",padding:"8px 16px",borderRadius:8,cursor:"pointer",fontSize:13,width:"100%",marginBottom:8 }}>
+              {hintShown?"Hide Hint":"Show Hint"}
+            </button>
+            {hintShown&&<div style={{ background:"rgba(255,184,0,0.05)",border:"1px solid rgba(255,184,0,0.15)",borderRadius:8,padding:14,color:"#ffb800",fontSize:13,lineHeight:1.6,marginBottom:14 }}>{q.hint}</div>}
+            <div style={{ display:"flex",gap:8 }}>
+              <button onClick={()=>setQIdx(i=>Math.max(0,i-1))} disabled={qIdx===0}
+                style={{ flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"#888",padding:"8px",borderRadius:8,cursor:"pointer",fontSize:13,opacity:qIdx===0?0.4:1 }}>← Prev</button>
+              <button onClick={()=>setQIdx(i=>Math.min(CODING_QS.length-1,i+1))} disabled={qIdx===CODING_QS.length-1}
+                style={{ flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"#888",padding:"8px",borderRadius:8,cursor:"pointer",fontSize:13,opacity:qIdx===CODING_QS.length-1?0.4:1 }}>Next →</button>
+            </div>
+          </div>
+        )}
+
+        {!result && (
+          <div>
+            {/* Language selector */}
+            <div style={{ display:"flex",gap:4,marginBottom:10,background:"rgba(0,0,0,0.35)",borderRadius:10,padding:5,border:"1px solid rgba(255,255,255,0.06)",flexWrap:"wrap" }}>
+              {LANGUAGES.map(l=>(
+                <button key={l.id} onClick={()=>setLang(l.id)} style={{
+                  padding:"5px 11px",borderRadius:7,cursor:"pointer",fontFamily:"monospace",fontSize:12,fontWeight:600,
+                  border:lang===l.id?`1px solid ${l.color}55`:"1px solid transparent",
+                  background:lang===l.id?`${l.color}18`:"none",
+                  color:lang===l.id?l.color:"#555",transition:"all 0.18s" }}>{l.label}</button>
+              ))}
+            </div>
+            {/* Editor chrome */}
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",background:"#0d1117",borderRadius:"10px 10px 0 0",padding:"8px 14px",border:"1px solid rgba(255,255,255,0.08)",borderBottom:"1px solid rgba(255,255,255,0.04)" }}>
+              <div style={{ display:"flex",alignItems:"center",gap:6 }}>
+                {[0,1,2].map(i=><div key={i} style={{ width:10,height:10,borderRadius:"50%",background:"#2a2a2a" }}/>)}
+                <span style={{ marginLeft:6,fontFamily:"monospace",fontSize:11,color:"#444" }}>solution.{activeLang.ext}</span>
+              </div>
+              <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+                <span style={{ fontSize:10,fontFamily:"monospace",color:activeLang.color,background:`${activeLang.color}15`,padding:"2px 8px",borderRadius:4,border:`1px solid ${activeLang.color}30` }}>{activeLang.label}</span>
+                <span style={{ color:"#333",fontSize:11,fontFamily:"monospace" }}>{lineCount} ln</span>
+                <button onClick={()=>setCode(q.starterCode[lang])} style={{ background:"none",border:"1px solid #2a2a2a",color:"#555",cursor:"pointer",fontSize:11,padding:"2px 8px",borderRadius:4,fontFamily:"monospace" }}>↺ Reset</button>
+              </div>
+            </div>
+            <div style={{ position:"relative" }}>
+              <div style={{ position:"absolute",top:0,left:0,width:42,height:"100%",background:"rgba(0,0,0,0.2)",borderRight:"1px solid rgba(255,255,255,0.04)",display:"flex",flexDirection:"column",paddingTop:14,boxSizing:"border-box",userSelect:"none",overflow:"hidden" }}>
+                {Array.from({length:Math.max(lineCount+3,18)},(_,i)=>(
+                  <div key={i} style={{ color:"#272727",fontSize:11,fontFamily:"monospace",textAlign:"right",paddingRight:8,lineHeight:"22px" }}>{i+1}</div>
+                ))}
+              </div>
+              <textarea value={code} onChange={e=>setCode(e.target.value)} spellCheck={false}
+                onKeyDown={e=>{ if(e.key==="Tab"){e.preventDefault();const s=e.target.selectionStart,v=code;setCode(v.slice(0,s)+"  "+v.slice(e.target.selectionEnd));setTimeout(()=>e.target.setSelectionRange(s+2,s+2),0);}}}
+                style={{ width:"100%",minHeight:360,paddingLeft:50,paddingRight:16,paddingTop:14,paddingBottom:14,
+                  fontFamily:"'Courier New',monospace",fontSize:13,lineHeight:"22px",
+                  background:"#0d1117",border:"1px solid rgba(255,255,255,0.08)",borderTop:"none",
+                  borderRadius:"0 0 10px 10px",color:"#e6edf3",resize:"vertical",outline:"none",boxSizing:"border-box" }}/>
+            </div>
+            <button onClick={()=>{ const r=scoreCode(code,q,lang); if(r) setResult(r); }}
+              style={{ marginTop:12,width:"100%",padding:"14px",background:"linear-gradient(135deg,#00ff88,#00cc6a)",
+                border:"none",borderRadius:10,color:"#000",fontWeight:900,fontSize:15,cursor:"pointer",letterSpacing:1,fontFamily:"monospace" }}>
+              SUBMIT & EVALUATE
+            </button>
+          </div>
+        )}
+
+        {result && (
+          <ResultPanel result={result} meta={meta} lang={activeLang} type="coding"
+            extra={<div style={{ background:"rgba(0,180,255,0.04)",border:"1px solid rgba(0,180,255,0.12)",borderRadius:12,padding:18,marginBottom:16 }}>
+              <div style={{ color:"#00b4ff",fontSize:11,fontFamily:"monospace",letterSpacing:2,marginBottom:8 }}>OPTIMAL APPROACH</div>
+              <p style={{ color:"#ccc",fontSize:13,lineHeight:1.7,margin:"0 0 10px" }}>{result.optimalApproach}</p>
+              <div style={{ borderTop:"1px solid rgba(0,180,255,0.1)",paddingTop:10,color:"#00b4ff",fontSize:12 }}>Interview Tip: {result.interviewTip}</div>
+            </div>}
+            onRetry={()=>setResult(null)}
+            onNext={()=>{ setResult(null); if(qIdx<CODING_QS.length-1) setQIdx(i=>i+1); }}
+            onDone={()=>onComplete(result.overall)}
+            isLast={qIdx===CODING_QS.length-1}
+            scoreLabels={["Correctness","Efficiency","Code Quality","Communication"]}
+            scoreVals={[result.correctness,result.efficiency,result.codeQuality,result.communication]}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ResultPanel({ result, meta, lang, type, extra, onRetry, onNext, onDone, isLast, scoreLabels, scoreVals }) {
+  const vc = result.verdictColor || ({"Accepted":"#00ff88","Partially Correct":"#ffb800","Needs Improvement":"#ff6b35","Wrong Answer":"#ff4d6d","Excellent":"#00ff88","Good":"#00b4ff","Average":"#ffb800","Below Average":"#ff4d6d"}[result.verdict||result.grade]||"#aaa");
+  const displayVerdict = result.verdict || result.grade;
+  return (
+    <div>
+      <div style={{ display:"flex",alignItems:"center",gap:20,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:24,marginBottom:18,flexWrap:"wrap" }}>
+        <ScoreRing score={result.overall} color={meta.color} size={90}/>
+        <div>
+          <div style={{ fontSize:10,letterSpacing:3,color:"#555",fontFamily:"monospace",marginBottom:6 }}>OVERALL SCORE</div>
+          <div style={{ fontSize:26,fontWeight:900,color:"#fff",fontFamily:"monospace" }}>{result.overall}<span style={{ fontSize:13,color:"#555" }}>/100</span></div>
+          <div style={{ display:"inline-block",marginTop:8,padding:"3px 10px",background:`${vc}15`,color:vc,borderRadius:5,fontSize:11,border:`1px solid ${vc}30`,fontFamily:"monospace" }}>{displayVerdict}</div>
+        </div>
+        {type==="coding"&&<div style={{ marginLeft:"auto",textAlign:"right" }}>
+          <div style={{ fontSize:11,color:"#555",marginBottom:4 }}>Complexity</div>
+          <div style={{ fontFamily:"monospace",color:"#00b4ff",fontSize:13 }}>Time: {result.timeComplexity}</div>
+          <div style={{ fontFamily:"monospace",color:"#ff6b35",fontSize:13 }}>Space: {result.spaceComplexity}</div>
+          {lang&&<div style={{ marginTop:8,fontSize:10,fontFamily:"monospace",color:lang.color,background:`${lang.color}15`,padding:"2px 8px",borderRadius:4,border:`1px solid ${lang.color}30`,display:"inline-block" }}>{lang.label}</div>}
+        </div>}
+      </div>
+      <div style={{ display:"grid",gridTemplateColumns:`repeat(${scoreLabels.length},1fr)`,gap:10,marginBottom:18 }}>
+        {scoreLabels.map((l,i)=>(
+          <div key={l} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:10,padding:"14px 10px",textAlign:"center" }}>
+            <div style={{ fontSize:20,fontWeight:700,color:scoreVals[i]>=70?"#00ff88":scoreVals[i]>=50?"#ffb800":"#ff4d6d",fontFamily:"monospace" }}>{scoreVals[i]}</div>
+            <div style={{ color:"#555",fontSize:10,marginTop:4 }}>{l}</div>
+            <div style={{ marginTop:8,height:3,background:"rgba(255,255,255,0.06)",borderRadius:2 }}>
+              <div style={{ width:`${scoreVals[i]}%`,height:"100%",background:scoreVals[i]>=70?meta.color:scoreVals[i]>=50?"#ffb800":"#ff4d6d",borderRadius:2,transition:"width 0.8s ease" }}/>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:16 }}>
+        <div style={{ background:"rgba(0,255,136,0.04)",border:"1px solid rgba(0,255,136,0.12)",borderRadius:12,padding:18 }}>
+          <div style={{ color:"#00ff88",fontSize:11,fontFamily:"monospace",letterSpacing:2,marginBottom:10 }}>✓ {type==="coding"?"STRENGTHS":"COVERED"}</div>
+          {(result.strengths||result.coveredPoints||[]).map((s,i)=><div key={i} style={{ color:"#ccc",fontSize:13,marginBottom:7,display:"flex",gap:8 }}><span style={{ color:"#00ff88",flexShrink:0 }}>→</span>{s}</div>)}
+        </div>
+        <div style={{ background:"rgba(255,107,53,0.04)",border:"1px solid rgba(255,107,53,0.12)",borderRadius:12,padding:18 }}>
+          <div style={{ color:"#ff6b35",fontSize:11,fontFamily:"monospace",letterSpacing:2,marginBottom:10 }}>⚠ {type==="coding"?"IMPROVEMENTS":"MISSED"}</div>
+          {(result.improvements||result.missedPoints||[]).slice(0,3).map((s,i)=><div key={i} style={{ color:"#ccc",fontSize:13,marginBottom:7,display:"flex",gap:8 }}><span style={{ color:"#ff6b35",flexShrink:0 }}>→</span>{s}</div>)}
+        </div>
+      </div>
+      {extra}
+      <div style={{ display:"flex",gap:10 }}>
+        <button onClick={onRetry} style={{ flex:1,padding:"12px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",color:"#888",borderRadius:10,cursor:"pointer",fontSize:13,fontFamily:"monospace" }}>↺ RETRY</button>
+        {!isLast&&<button onClick={onNext} style={{ flex:2,padding:"12px",background:`${meta.color}15`,border:`1px solid ${meta.color}44`,color:meta.color,borderRadius:10,cursor:"pointer",fontSize:13,fontFamily:"monospace",fontWeight:700 }}>NEXT →</button>}
+        <button onClick={onDone} style={{ flex:1,padding:"12px",background:`linear-gradient(135deg,${meta.color},${meta.color}cc)`,border:"none",color:"#000",borderRadius:10,cursor:"pointer",fontSize:13,fontFamily:"monospace",fontWeight:900 }}>✓ DONE</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── TECHNICAL ROUND ──────────────────────────────────────────────────────────
+function TechnicalRound({ onComplete, onBack }) {
+  const [qIdx, setQIdx] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [result, setResult] = useState(null);
+  const q = TECHNICAL_QS[qIdx];
+  const meta = ROUND_META.technical;
+  const catColors = {"System Design":"#ff6b35","OS Concepts":"#00b4ff","Databases":"#9b59b6","Networking":"#00ff88","OOP & Design Patterns":"#ffb800","Behavioral":"#e91e63"};
+
+  if (result) return (
+    <div style={{ maxWidth:900,margin:"0 auto",padding:"0 24px" }}>
+      <div style={{ padding:"20px 0",borderBottom:"1px solid rgba(255,255,255,0.06)",marginBottom:20 }}>
+        <button onClick={onBack} style={{ background:"none",border:"1px solid #333",color:"#888",padding:"6px 14px",borderRadius:8,cursor:"pointer",fontSize:13 }}>← Back</button>
+      </div>
+      <ResultPanel result={result} meta={meta} type="technical"
+        extra={<>
+          <div style={{ background:"rgba(0,180,255,0.04)",border:"1px solid rgba(0,180,255,0.12)",borderRadius:12,padding:18,marginBottom:16 }}>
+            <div style={{ color:"#00b4ff",fontSize:11,fontFamily:"monospace",letterSpacing:2,marginBottom:8 }}>MODEL ANSWER</div>
+            <p style={{ color:"#ccc",fontSize:13,lineHeight:1.7,margin:"0 0 10px" }}>{result.modelAnswer}</p>
+            <div style={{ borderTop:"1px solid rgba(0,180,255,0.1)",paddingTop:10,color:"#ffb800",fontSize:12 }}>Likely Follow-up: "{result.followUpQ}"</div>
+          </div>
+          {result.commonMistakes&&<div style={{ background:"rgba(255,184,0,0.04)",border:"1px solid rgba(255,184,0,0.12)",borderRadius:12,padding:18,marginBottom:16 }}>
+            <div style={{ color:"#ffb800",fontSize:11,fontFamily:"monospace",letterSpacing:2,marginBottom:10 }}>COMMON MISTAKES TO AVOID</div>
+            {result.commonMistakes.map((s,i)=><div key={i} style={{ color:"#ccc",fontSize:13,marginBottom:7 }}>→ {s}</div>)}
+          </div>}
+        </>}
+        onRetry={()=>{setResult(null);setAnswer("");}}
+        onNext={()=>{setResult(null);setAnswer("");setQIdx(i=>i+1);}}
+        onDone={()=>onComplete(result.overall)}
+        isLast={qIdx===TECHNICAL_QS.length-1}
+        scoreLabels={["Depth","Accuracy","Clarity","Completeness"]}
+        scoreVals={[result.depth,result.accuracy,result.clarity,result.completeness]}
+      />
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth:900,margin:"0 auto",padding:"0 24px" }}>
+      <div style={{ display:"flex",alignItems:"center",gap:12,padding:"20px 0",borderBottom:"1px solid rgba(255,255,255,0.06)",marginBottom:20,flexWrap:"wrap" }}>
+        <button onClick={onBack} style={{ background:"none",border:"1px solid #333",color:"#888",padding:"6px 14px",borderRadius:8,cursor:"pointer",fontSize:13 }}>← Back</button>
+        <div style={{ flex:1 }}>
+          <div style={{ color:meta.color,fontSize:10,letterSpacing:3,fontFamily:"monospace" }}>TECHNICAL ROUND</div>
+          <div style={{ color:"#fff",fontWeight:700 }}>Q {qIdx+1} / {TECHNICAL_QS.length}</div>
+        </div>
+        <Timer key={qIdx} running={true} initialSeconds={600}/>
+      </div>
+      <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:24,marginBottom:14 }}>
+        <div style={{ display:"flex",gap:8,marginBottom:14,flexWrap:"wrap" }}>
+          <Tag color={catColors[q.category]||"#888"}>{q.category}</Tag>
+          <Tag color={DIFF_COLORS[q.difficulty]}>{q.difficulty}</Tag>
+          {q.company.slice(0,3).map(c=><Tag key={c} color="#555">{c}</Tag>)}
+        </div>
+        <p style={{ color:"#ddd",fontSize:15,lineHeight:1.8 }}>{q.question}</p>
+      </div>
+      <div style={{ background:"rgba(0,180,255,0.03)",border:"1px solid rgba(0,180,255,0.1)",borderRadius:12,padding:14,marginBottom:14 }}>
+        <div style={{ color:"#00b4ff",fontSize:10,fontFamily:"monospace",letterSpacing:2,marginBottom:8 }}>KEY POINTS TO COVER</div>
+        <div style={{ display:"flex",flexWrap:"wrap",gap:6 }}>{q.keyPoints.map(p=><Tag key={p} color="#00b4ff">{p}</Tag>)}</div>
+      </div>
+      <textarea value={answer} onChange={e=>setAnswer(e.target.value)}
+        placeholder="Write your answer here. Cover the key points above, use examples, and discuss trade-offs..."
+        style={{ width:"100%",minHeight:200,padding:18,background:"#0d1117",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,color:"#e6edf3",fontSize:14,lineHeight:1.7,resize:"vertical",outline:"none",boxSizing:"border-box",fontFamily:"Georgia,serif" }}/>
+      <div style={{ display:"flex",justifyContent:"space-between",margin:"6px 0 14px" }}>
+        <span style={{ color:"#555",fontSize:12 }}>{answer.length} chars</span>
+        <span style={{ color:answer.length>=100?"#00ff88":"#555",fontSize:12 }}>{answer.length>=100?"Ready":"Aim for 100+ chars"}</span>
+      </div>
+      <div style={{ display:"flex",gap:10 }}>
+        <button onClick={()=>{setQIdx(i=>Math.max(0,i-1));setAnswer("");}} disabled={qIdx===0}
+          style={{ padding:"12px 18px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"#888",borderRadius:10,cursor:"pointer",fontSize:13,opacity:qIdx===0?0.4:1 }}>← Prev</button>
+        <button onClick={()=>{ const r=scoreTechnical(answer,q); if(r) setResult(r); }} disabled={answer.length<20}
+          style={{ flex:1,padding:"14px",background:answer.length>=20?"linear-gradient(135deg,#00b4ff,#0088cc)":"rgba(255,255,255,0.05)",
+            border:"none",borderRadius:10,color:answer.length>=20?"#000":"#555",
+            fontWeight:900,fontSize:15,cursor:answer.length>=20?"pointer":"not-allowed",letterSpacing:1,fontFamily:"monospace" }}>
+          SUBMIT ANSWER
+        </button>
+        <button onClick={()=>{setQIdx(i=>Math.min(TECHNICAL_QS.length-1,i+1));setAnswer("");}} disabled={qIdx===TECHNICAL_QS.length-1}
+          style={{ padding:"12px 18px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"#888",borderRadius:10,cursor:"pointer",fontSize:13,opacity:qIdx===TECHNICAL_QS.length-1?0.4:1 }}>Next →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── APTITUDE ROUND ───────────────────────────────────────────────────────────
+function AptitudeRound({ onComplete, onBack }) {
+  const [qIdx, setQIdx] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [scores, setScores] = useState([]);
+  const q = APTITUDE_QS[qIdx];
+  const meta = ROUND_META.aptitude;
+  const isCorrect = selected===q.answer;
+  const catColors = {"Quantitative":"#ff6b35","Logical Reasoning":"#00b4ff","Data Interpretation":"#9b59b6","Pattern Recognition":"#00ff88","Verbal":"#ffb800"};
+
+  const handleNext = () => {
+    const ns=[...scores,(submitted&&isCorrect?100:0)];
+    if (qIdx===APTITUDE_QS.length-1) { onComplete(Math.round(ns.reduce((a,b)=>a+b,0)/ns.length)); return; }
+    setScores(ns); setQIdx(i=>i+1); setSelected(null); setSubmitted(false);
+  };
+
+  return (
+    <div style={{ maxWidth:800,margin:"0 auto",padding:"0 24px" }}>
+      <div style={{ display:"flex",alignItems:"center",gap:12,padding:"20px 0",borderBottom:"1px solid rgba(255,255,255,0.06)",marginBottom:20 }}>
+        <button onClick={onBack} style={{ background:"none",border:"1px solid #333",color:"#888",padding:"6px 14px",borderRadius:8,cursor:"pointer",fontSize:13 }}>← Back</button>
+        <div style={{ flex:1 }}><div style={{ color:meta.color,fontSize:10,letterSpacing:3,fontFamily:"monospace" }}>APTITUDE ROUND</div></div>
+        <Timer key={qIdx} running={!submitted} initialSeconds={90} onTimeUp={()=>setSubmitted(true)}/>
+      </div>
+      <div style={{ display:"flex",gap:5,marginBottom:22 }}>
+        {APTITUDE_QS.map((_,i)=>(
+          <div key={i} style={{ flex:1,height:4,borderRadius:2,background:i<qIdx?"#00ff88":i===qIdx?meta.color:"rgba(255,255,255,0.08)" }}/>
+        ))}
+      </div>
+      <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:24,marginBottom:18 }}>
+        <div style={{ display:"flex",gap:8,marginBottom:14,flexWrap:"wrap" }}>
+          <Tag color={catColors[q.category]||"#888"}>{q.category}</Tag>
+          <Tag color={DIFF_COLORS[q.difficulty]}>{q.difficulty}</Tag>
+          <span style={{ marginLeft:"auto",color:"#555",fontSize:13,fontFamily:"monospace" }}>Q{qIdx+1}/{APTITUDE_QS.length}</span>
+        </div>
+        <p style={{ color:"#ddd",fontSize:15,lineHeight:1.8 }}>{q.question}</p>
+      </div>
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18 }}>
+        {q.options.map((opt,i)=>{
+          let bg="rgba(255,255,255,0.03)",bdr="rgba(255,255,255,0.08)",col="#ccc";
+          if(submitted){ if(i===q.answer){bg="rgba(0,255,136,0.08)";bdr="rgba(0,255,136,0.3)";col="#00ff88";}else if(i===selected){bg="rgba(255,77,109,0.08)";bdr="rgba(255,77,109,0.3)";col="#ff4d6d";}}
+          else if(i===selected){bg="rgba(255,107,53,0.1)";bdr=meta.color;col=meta.color;}
+          return (
+            <button key={i} onClick={()=>!submitted&&setSelected(i)}
+              style={{ background:bg,border:`1px solid ${bdr}`,color:col,padding:"14px 18px",borderRadius:12,cursor:submitted?"default":"pointer",fontSize:14,textAlign:"left",transition:"all 0.2s",display:"flex",alignItems:"center",gap:10 }}>
+              <span style={{ fontFamily:"monospace",fontSize:11,color:"#555",minWidth:18 }}>{String.fromCharCode(65+i)}.</span>
+              {opt}
+              {submitted&&i===q.answer&&<span style={{ marginLeft:"auto" }}>✓</span>}
+              {submitted&&i===selected&&i!==q.answer&&<span style={{ marginLeft:"auto" }}>✗</span>}
+            </button>
+          );
+        })}
+      </div>
+      {!submitted&&(
+        <button onClick={()=>selected!==null&&setSubmitted(true)} disabled={selected===null}
+          style={{ width:"100%",padding:"14px",background:selected!==null?"linear-gradient(135deg,#ff6b35,#ff4500)":"rgba(255,255,255,0.05)",
+            border:"none",borderRadius:10,color:selected!==null?"#fff":"#555",
+            fontWeight:900,fontSize:15,cursor:selected!==null?"pointer":"not-allowed",letterSpacing:1,fontFamily:"monospace" }}>
+          SUBMIT ANSWER
+        </button>
+      )}
+      {submitted&&<>
+        <div style={{ background:isCorrect?"rgba(0,255,136,0.06)":"rgba(255,77,109,0.06)",border:`1px solid ${isCorrect?"rgba(0,255,136,0.2)":"rgba(255,77,109,0.2)"}`,borderRadius:12,padding:18,marginBottom:14 }}>
+          <div style={{ fontSize:15,fontWeight:700,color:isCorrect?"#00ff88":"#ff4d6d",marginBottom:8 }}>{isCorrect?"✓ Correct!":"✗ Incorrect"}</div>
+          <p style={{ color:"#ccc",fontSize:13,lineHeight:1.7 }}><strong style={{ color:"#fff" }}>Explanation: </strong>{q.explanation}</p>
+        </div>
+        <button onClick={handleNext}
+          style={{ width:"100%",padding:"14px",background:qIdx===APTITUDE_QS.length-1?"linear-gradient(135deg,#00ff88,#00cc6a)":"rgba(255,107,53,0.15)",
+            border:qIdx===APTITUDE_QS.length-1?"none":"1px solid rgba(255,107,53,0.3)",
+            color:qIdx===APTITUDE_QS.length-1?"#000":meta.color,
+            fontWeight:900,fontSize:15,cursor:"pointer",letterSpacing:1,fontFamily:"monospace",borderRadius:10 }}>
+          {qIdx===APTITUDE_QS.length-1?"✓ FINISH ROUND":"NEXT QUESTION →"}
+        </button>
+      </>}
+    </div>
+  );
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [screen, setScreen] = useState("home");
+  const [scores, setScores] = useState({ coding:{avg:0,sessions:0},technical:{avg:0,sessions:0},aptitude:{avg:0,sessions:0} });
+  const complete = (type, score) => {
+    setScores(prev=>{ const o=prev[type],s=o.sessions+1,a=Math.round((o.avg*o.sessions+score)/s); return {...prev,[type]:{avg:a,sessions:s}}; });
+    setScreen("home");
+  };
+  return (
+    <div style={{ minHeight:"100vh",background:"#080810",color:"#fff",fontFamily:"'Trebuchet MS',sans-serif" }}>
+      <div style={{ position:"fixed",inset:0,pointerEvents:"none",zIndex:0,backgroundImage:"linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px)",backgroundSize:"60px 60px" }}/>
+      <div style={{ position:"fixed",top:-200,left:"50%",transform:"translateX(-50%)",width:600,height:600,borderRadius:"50%",background:"radial-gradient(circle,rgba(0,255,136,0.04) 0%,transparent 70%)",pointerEvents:"none",zIndex:0 }}/>
+
+      <nav style={{ position:"sticky",top:0,zIndex:100,background:"rgba(8,8,16,0.9)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,0.06)",padding:"0 24px",height:54,display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+        <div onClick={()=>setScreen("home")} style={{ cursor:"pointer",display:"flex",alignItems:"center",gap:10 }}>
+          <div style={{ width:28,height:28,borderRadius:7,background:"linear-gradient(135deg,#00ff88,#00b4ff)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,color:"#000",fontFamily:"monospace" }}>IQ</div>
+          <span style={{ fontWeight:900,fontSize:15,fontFamily:"monospace",letterSpacing:1 }}>PREP<span style={{ color:"#00ff88" }}>IQ</span></span>
+        </div>
+        <div style={{ display:"flex",gap:4 }}>
+          {[{id:"coding",label:"Coding",color:"#00ff88"},{id:"technical",label:"Technical",color:"#00b4ff"},{id:"aptitude",label:"Aptitude",color:"#ff6b35"}].map(({id,label,color})=>(
+            <button key={id} onClick={()=>setScreen(id)} style={{ background:screen===id?`${color}15`:"none",border:screen===id?`1px solid ${color}44`:"1px solid transparent",color:screen===id?color:"#555",padding:"5px 12px",borderRadius:7,cursor:"pointer",fontSize:12,transition:"all 0.2s",fontFamily:"monospace" }}>{label}</button>
+          ))}
+        </div>
+        <div style={{ display:"flex",gap:14,alignItems:"center" }}>
+          {Object.entries(scores).map(([k,s])=>s.sessions>0&&(
+            <div key={k} style={{ textAlign:"center" }}>
+              <div style={{ color:ROUND_META[k].color,fontSize:13,fontWeight:700,fontFamily:"monospace" }}>{s.avg}%</div>
+              <div style={{ color:"#444",fontSize:9,letterSpacing:1 }}>{k.toUpperCase()}</div>
+            </div>
+          ))}
+        </div>
+      </nav>
+
+      <div style={{ position:"relative",zIndex:1,paddingBottom:60 }}>
+        {screen==="home"      && <Home onStart={setScreen} scores={scores}/>}
+        {screen==="coding"    && <CodingRound    onComplete={s=>complete("coding",s)}    onBack={()=>setScreen("home")}/>}
+        {screen==="technical" && <TechnicalRound onComplete={s=>complete("technical",s)} onBack={()=>setScreen("home")}/>}
+        {screen==="aptitude"  && <AptitudeRound  onComplete={s=>complete("aptitude",s)}  onBack={()=>setScreen("home")}/>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
